@@ -3,16 +3,16 @@ from flask import Flask, request
 app = Flask(__name__)
 
 
-items = [
-        {
+items = {
+        "":{
             "name" : "Green Apple Mojito",
             "price": 160
         },
-        {
+        "":{
             "name" : "Momos",
             "price": 60
         }
-]
+}
 
 @app.get('/items')
 def get_items():
