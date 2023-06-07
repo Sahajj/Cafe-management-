@@ -4,7 +4,7 @@ items = {
                                                 "price": 160
                                             },
         "e02825ff039b4d5395325d9b241866c9":{
-                                                "name" : "Momos",
+                                                "name" : "Paneer Tikka",
                                                 "price": 60
                                            }
 }

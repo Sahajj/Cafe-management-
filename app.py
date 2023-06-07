@@ -3,13 +3,11 @@ import uuid
 from db import items
 app = Flask(__name__)
 
-@app.get('/items')
-def get_items():
-    return {"items":items}
-
 @app.get('/item')
 def get_item():
     id = request.args.get('id')
+    if id is None:
+        return {"items":items}
     try :
         return items[id]
     except KeyError:
