@@ -13,9 +13,11 @@ class Item(MethodView):
     def get(self):
         id = request.args.get('id')
         if id is None:
-            return {"items":items}
+            return items
         try :
-            return items[id]
+            for item in items:
+                if item['id'] == id:
+                    return [item]
         except KeyError:
             return {'message': "Recoed doesn't exisit"}, 404
 
@@ -29,12 +31,12 @@ class Item(MethodView):
         id = request.args.get('id')
         if id == None:
             return {'message': "Given id not found"}, 404 
-
-        if id in items.keys():
-            items[id] = request_data
+        for item in items:
+            if item['id'] == id:
+                item['name'] = request_data['name']
+                item['price'] = request_data['price']  
             return {"message":"item updated successfully"}, 200
-        else :
-            return {'message': "Not found"}, 404
+        return {'message': "Not found"}, 404
         
 
     def delete(self):
