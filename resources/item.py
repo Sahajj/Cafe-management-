@@ -2,48 +2,57 @@ from flask import Flask, request
 import uuid
 from db import items
 from flask.views import MethodView
-from flask_smorest import Blueprint
-from schemas import ItemSchema
-
+from flask_smorest import Blueprint, abort
+from schemas import ItemSchema, ItemGetSchema , SuccessMessageSchema, ItemQuerySchema, ItemOptionalQuerySchmea
 
 blp = Blueprint("items", __name__, description="Operations on items")
 
 @blp.route("/item")
 class Item(MethodView):
-    def get(self):
-        id = request.args.get('id')
+
+    @blp.response(200, ItemGetSchema(many=True))
+    @blp.arguments(ItemOptionalQuerySchmea, location="query")
+    def get(self, args):
+        id = args.get('id')
         if id is None:
             return items
-        try :
-            for item in items:
-                if item['id'] == id:
-                    return [item]
-        except KeyError:
-            return {'message': "Recoed doesn't exisit"}, 404
-
-    @blp.arguments(ItemSchema)
-    def post(self, request_data):
-        items[uuid.uuid4().hex]= request_data
-        return {"message":"item added successfully"}, 201
-
-    @blp.arguments(ItemSchema)
-    def put(self, request_data):
-        id = request.args.get('id')
-        if id == None:
-            return {'message': "Given id not found"}, 404 
         for item in items:
             if item['id'] == id:
-                item['name'] = request_data['name']
-                item['price'] = request_data['price']  
-            return {"message":"item updated successfully"}, 200
-        return {'message': "Not found"}, 404
-        
+                return [item]
+        abort(404 ,message = "Recoed doesn't exisit")
 
-    def delete(self):
-        id = request.args.get('id')
-        if id == None:
-            return {'message': "Given id not found"}, 404 
-            if id in items.keys():
-                del items[id] 
-                return {'message' : 'Item delete successfully'}
-        return {'message': "Recoed doesn't exisit"}, 404
+    @blp.arguments(ItemSchema)
+    @blp.response(200, SuccessMessageSchema)
+    @blp.arguments(ItemQuerySchema, location="query")
+    def put(self, request_data, args):
+        id = args.get('id')
+        for item in items:
+            if item['id'] == id:
+                item['item']['name'] = request_data['name']
+                item['item']['price'] = request_data['price']  
+                return {"message":"item updated successfully"}, 200
+        abort(404 ,message = "Not found")
+
+    @blp.arguments(ItemSchema)
+    @blp.response(200, SuccessMessageSchema)
+    def post(self, request_data):
+        item = {
+            'id':uuid.uuid4().hex,
+            'item' : {
+                "name" : request_data["name"],
+                "price" : request_data["price"]
+                 }
+            }
+        items.append(item)
+        return {"message":"item added successfully"}, 201
+
+    @blp.response(200, SuccessMessageSchema)
+    @blp.arguments(ItemQuerySchema, location="query")
+    def delete(self, args):
+        id = args.get('id')
+        for item in items:
+                if item['id'] == id:
+                    items.remove(item)
+                    return {'message' : 'Item delete successfully'}
+ 
+        abort(404 ,message = "Recoed doesn't exisit")
