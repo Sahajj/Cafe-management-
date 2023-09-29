@@ -1,6 +1,6 @@
 # Cafe-management-systems
 
-This is a cafa mangements systems usign Rest api.
+This is a cafe management system using Rest api.
 
 <!-- I extencively used flask to create this procjet 
 
